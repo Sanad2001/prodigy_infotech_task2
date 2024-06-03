@@ -1,0 +1,94 @@
+from PIL import Image
+import numpy as np
+
+print("------------- Image Encryption Tool --------------")
+
+def encrypt_image(image_path, encryption_key):
+    try:
+        # Open the original image
+        original_image = Image.open(image_path)
+
+        # Convert the image to a NumPy array
+        image_array = np.array(original_image)
+
+        # Apply encryption to each pixel using the key
+        encrypted_array = (image_array * encryption_key) // (encryption_key + 1)
+
+        # Create a new image from the encrypted array
+        encrypted_image = Image.fromarray(np.uint8(encrypted_array))
+
+        # Save the encrypted image
+        encrypted_image_path = "encrypted_image.png"
+        encrypted_image.save(encrypted_image_path)
+        print(f"Image encrypted successfully. Encrypted image saved at: {encrypted_image_path}")
+    except Exception as error:
+        print(f"An error occurred during encryption: {error}")
+
+def decrypt_image(encrypted_image_path, decryption_key):
+    try:
+        # Open the encrypted image
+        encrypted_image = Image.open(encrypted_image_path)
+
+        # Convert the image to a NumPy array
+        encrypted_array = np.array(encrypted_image)
+
+        # Reverse the encryption using the key
+        decrypted_array = (encrypted_array * (decryption_key + 1)) // decryption_key
+
+        # Clip values to ensure they are in the valid pixel value range
+        decrypted_array = np.clip(decrypted_array, 0, 255)
+
+        # Create a new image from the decrypted array
+        decrypted_image = Image.fromarray(np.uint8(decrypted_array))
+
+        # Save the decrypted image
+        decrypted_image_path = "decrypted_image.png"
+        decrypted_image.save(decrypted_image_path)
+        print(f"Image decrypted successfully. Decrypted image saved at: {decrypted_image_path}")
+    except Exception as error:
+        print(f"An error occurred during decryption: {error}")
+
+def main():
+    while True:
+        print("Select an option:")
+        print("e - Encrypt image")
+        print("d - Decrypt image")
+        print("q - Quit")
+        user_choice = input("Your choice: ").strip().lower()
+
+        if user_choice == 'e':
+            handle_encryption()
+        elif user_choice == 'd':
+            handle_decryption()
+        elif user_choice == 'q':
+            print("Exiting the program.")
+            break
+        else:
+            print("Invalid choice. Please choose 'e' for encryption, 'd' for decryption, or 'q' to quit.")
+
+def handle_encryption():
+    while True:
+        try:
+            encryption_key = int(input("Enter encryption key (integer): "))
+            image_path = input("Enter the location or path of the image: ")
+            encrypt_image(image_path, encryption_key)
+            break
+        except ValueError:
+            print("Invalid key. Please enter an integer.")
+        except FileNotFoundError:
+            print("Invalid location. Image not found. Please try again.")
+
+def handle_decryption():
+    while True:
+        try:
+            decryption_key = int(input("Enter decryption key (integer): "))
+            encrypted_image_path = input("Enter the location or path of the encrypted image: ")
+            decrypt_image(encrypted_image_path, decryption_key)
+            break
+        except ValueError:
+            print("Invalid key. Please enter an integer.")
+        except FileNotFoundError:
+            print("Invalid location. Encrypted image not found. Please try again.")
+
+if __name__ == "__main__":
+    main()
